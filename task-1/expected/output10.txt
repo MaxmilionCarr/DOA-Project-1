@@ -1,0 +1,54 @@
+At time 1 drone 0 eliminates lantern 0
+At time 2 drone 1 eliminates lantern 1
+At time 3 drone 1 eliminates lantern 2
+At time 4 drone 1 eliminates lantern 3
+At time 5 drone 1 eliminates lantern 4
+At time 6 drone 1 eliminates lantern 5
+At time 7 drone 1 eliminates lantern 6
+At time 8 drone 1 eliminates lantern 7
+At time 9 drone 1 eliminates lantern 9
+At time 9 drone 2 eliminates lantern 8
+At time 15 drone 1 eliminates lantern 10
+At time 20 drone 0 eliminates lantern 11
+At time 20 drone 2 eliminates lantern 12
+At time 21 drone 0 eliminates lantern 13
+At time 21 drone 2 eliminates lantern 14
+At time 25 drone 0 eliminates lantern 15
+At time 25 drone 1 eliminates lantern 17
+At time 25 drone 2 eliminates lantern 16
+At time 28 drone 1 eliminates lantern 18
+At time 28 drone 2 eliminates lantern 19
+At time 35 drone 0 eliminates lantern 20
+At time 36 drone 0 eliminates lantern 21
+At time 37 drone 0 eliminates lantern 22
+At time 38 drone 0 eliminates lantern 23
+At time 39 drone 0 eliminates lantern 24
+At time 40 drone 1 eliminates lantern 25
+At time 41 drone 2 eliminates lantern 26
+At time 42 drone 2 eliminates lantern 27
+At time 43 drone 2 eliminates lantern 28
+At time 44 drone 2 eliminates lantern 29
+At time 45 drone 2 eliminates lantern 30
+At time 46 drone 2 eliminates lantern 31
+At time 47 drone 2 eliminates lantern 32
+At time 48 drone 2 eliminates lantern 33
+At time 49 drone 1 eliminates lantern 34
+At time 50 drone 0 eliminates lantern 35
+At time 51 drone 0 eliminates lantern 36
+At time 52 drone 0 eliminates lantern 37
+At time 53 drone 0 eliminates lantern 38
+At time 54 drone 0 eliminates lantern 39
+At time 60 drone 0 eliminates lantern 40
+At time 62 drone 1 eliminates lantern 41
+At time 64 drone 2 eliminates lantern 42
+At time 66 drone 2 eliminates lantern 43
+At time 68 drone 2 eliminates lantern 44
+At time 70 drone 0 eliminates lantern 45
+At time 72 drone 1 eliminates lantern 46
+At time 74 drone 1 eliminates lantern 47
+At time 76 drone 1 eliminates lantern 48
+At time 78 drone 2 eliminates lantern 49
+Lanterns eliminated 50 of 50
+Drone[0] lantern path: 0 11 13 15 20 21 22 23 35 36 37 38 39 40 45 
+Drone[1] lantern path: 1 2 3 9 10 17 18 24 34 41 46 47 48 
+Drone[2] lantern path: 4 5 6 7 8 12 14 16 19 25 26 27 28 29 30 31 32 33 42 43 44 49 

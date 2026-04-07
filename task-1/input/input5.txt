@@ -1,0 +1,13 @@
+Total time: 100
+Number of drones: 2
+Number of lanterns: 6
+Drones (starting location):
+1
+10
+Lanterns (location, arrival time):
+1 1
+10 1
+2 2
+9 2
+3 3
+8 3

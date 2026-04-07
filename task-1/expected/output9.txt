@@ -1,0 +1,7 @@
+At time 1 drone 0 eliminates lantern 0
+At time 1 drone 1 eliminates lantern 1
+At time 20 drone 0 eliminates lantern 3
+At time 20 drone 1 eliminates lantern 2
+Lanterns eliminated 4 of 4
+Drone[0] lantern path: 0 3 
+Drone[1] lantern path: 1 2 
