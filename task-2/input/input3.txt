@@ -1,0 +1,3 @@
+Number of subjects: 2
+COMP10002(1)COMP10001
+COMP10001(0)
