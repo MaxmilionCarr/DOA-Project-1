@@ -59,9 +59,6 @@ typedef struct {
  * names, argument types and return types that will be implemented in this file.
  */
 
-/* Comparison helper */
-int compare(const void *a, const void *b);
-
 /* reads the map */
 void read_map(map_t* map);
 
@@ -71,14 +68,14 @@ void simulate_map(map_t* map);
 /* output the simulation resuls */
 void simulation_results(map_t map);
 
-/* TODO: create lantern paths for drones to eliminate lanterns */
-void generate_lantern_paths(map_t* map);
-
 /* creates trajectories for simulation converting indicies stored in lantern path to trajectories*/
 void generate_trajectories(map_t* map);
 
+/* Create lantern paths for drones to eliminate lanterns */
+void generate_lantern_paths(map_t* map);
+
 /* TODO: Can make lantern a pointer for size optimisation */
-int find_best_drone(drone_t* drones, int num_drones, lantern_t lantern, int* drone_free_time, int* drone_cur_pos);
+int find_best_drone(drone_t* drones, int num_drones, lantern_t* lantern, int* drone_free_time, int* drone_cur_pos);
 
 
 /*
@@ -236,53 +233,51 @@ void simulation_results(map_t map){
     }
 }
 
-/* TODO: create lantern paths for drones to eliminate lanterns,
-    i.e., a set of indices that correspond to the order that a drone will eliminate lanterns*/
+/**
+    @brief Finds the best drone to eliminate a given lantern
+    @param drones An array of drone_t structs representing the given drones
+    @param num_drones The number of drones in the array
+    @param lantern A pointer to a lantern_t struct representing the current lantern
+    @param drone_free_time An array of integers representing the time at which each drone will be free to eliminate a new lantern
+    @param drone_cur_pos An array of integers representing the current position of each drone
+    @return The index of the best drone to eliminate the lantern, or -1 if no drone can eliminate the lantern
+**/ 
+int find_best_drone(drone_t* drones, int num_drones, lantern_t* lantern, int* drone_free_time, int* drone_cur_pos) {
 
-int compare_lantern(const void* a, const void* b) {
-    lantern_t lantern_a = *((lantern_t*) a);
-    lantern_t lantern_b = *((lantern_t*) b);
-
-    if (lantern_a.arrival_time > lantern_b.arrival_time) return 1;
-    else if (lantern_a.arrival_time < lantern_b.arrival_time) return -1;
-    else return 0;
-}
-
-// Determine all possible drones given arrival time and location, returns drone index
-/* 
-    Don't cahnge trajectory, instead use an array that keeps track of drones free time and additionally position to update
-    (Just have to return best drone like this but also pass free time and position arrays as pointers)
-*/
-int find_best_drone(drone_t* drones, int num_drones, lantern_t lantern, int* drone_free_time, int* drone_cur_pos) {
     int min_dist = INT_MAX;
-    int max_time_left = INT_MIN;
+    int max_time_avail = INT_MIN;
     int cur_best = -1;
 
+    // Iterate through each drone to find the best one to eliminate
     for (int i = 0; i < num_drones; i++) {
 
-        // Check availability
-        if (lantern.arrival_time < drone_free_time[i]) {
+        if (drone_free_time[i] == 0) {
+            drone_cur_pos[i] = drones[i].x; // Set initial position of drone if it has not yet moved
+        }
+
+        // Check 1: Availability at lantern arrival time
+        if (lantern->arrival_time < drone_free_time[i]) {
             continue;
         }
 
-        // Check feasibility
-        int distance = abs((lantern.x - drone_cur_pos[i]));
-        int time_left = lantern.arrival_time - drone_free_time[i];
+        // Check 2: Feasability of reaching the lantern in time
+        int distance = abs((lantern->x - drone_cur_pos[i]));
+        int time_avail = lantern->arrival_time - drone_free_time[i];
 
-        // If the time taken to go however far to lantern is greater than the time it can make it
-        if ((distance / DRONE_SPEED) > time_left) {
+        // Using formula t = d/s, determine if the maximum speed of the drone allows it to reach the lantern in available time
+        if ((distance / DRONE_SPEED) > time_avail) {
             continue;
         }
 
-        // Checks have passed hooray lets check if best
+        // Check 3: If both checks pass, tie break on distance to lantern, then time left after reaching lantern
         if (distance < min_dist) {
             cur_best = i;
             min_dist = distance;
-            max_time_left = time_left;
+            max_time_avail = time_avail;
         } else if (distance == min_dist) {
-            if (time_left > max_time_left) {
+            if (time_avail > max_time_avail) {
                 cur_best = i;
-                max_time_left = time_left;
+                max_time_avail = time_avail;
             }
         }
     }
@@ -290,40 +285,39 @@ int find_best_drone(drone_t* drones, int num_drones, lantern_t lantern, int* dro
     return cur_best;
 }
 
-
+/* TODO: create lantern paths for drones to eliminate lanterns,
+    i.e., a set of indices that correspond to the order that a drone will eliminate lanterns*/
 void generate_lantern_paths(map_t* map){
+
+    // Initalise map elements to single variables for ease of use
     drone_t* drones = map->drone;
     lantern_t* lanterns = map->lantern;
 
-    // Ensure sorted order on arrival time
-    qsort(lanterns, map->num_lanterns, sizeof(lantern_t), compare_lantern);
+    // Initalise mappings to track when drones will be free and the location of drones at these times (Could be used in the drone_t struct but unsure if task allows for this)
+    int* drone_free_time = (int*) calloc(map->num_drones, sizeof(int));
+    int* drone_free_pos = (int*) malloc(map->num_drones * sizeof(int));
 
-    // Will be better to have dynamic arrays for these
-    int drone_free_time[map->num_drones];
-    int drone_free_pos[map->num_drones];
-
-    for (int i = 0; i < map->num_drones; i++) {
-        drone_free_time[i] = 0;
-        drone_free_pos[i] = drones[i].x;
-    }
-
-    for (int i = 0 ; i < map->num_lanterns ; i++) {
+    for (int i = 0; i < map->num_lanterns; i++) {
         lantern_t cur_lantern = lanterns[i];
 
-
-        int best_idx = find_best_drone(drones, map->num_drones, cur_lantern, drone_free_time, drone_free_pos);
+        // Fetch the index of the best drone to eliminate the current lantern (-1 if no drone exists)
+        int best_idx = find_best_drone(drones, map->num_drones, &cur_lantern, drone_free_time, drone_free_pos);
         
         if (best_idx == -1) {
             continue;
         }
 
-
         // Commit a new addition to its lantern path
         drones[best_idx].lantern_path[drones[best_idx].path_length] = i;
         drones[best_idx].path_length++;
+
+        // Track when a drone will next be free and its location at this time
         drone_free_time[best_idx] = cur_lantern.arrival_time;
         drone_free_pos[best_idx] = cur_lantern.x;
     }
+
+    free (drone_free_time);
+    free (drone_free_pos);
 
 }
 
