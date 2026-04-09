@@ -102,6 +102,15 @@ void print_major(subject_t* major, int num_subjects){
 
 }
 
+/**
+    @brief Finds the best drone to eliminate a given lantern
+    @param drones An array of drone_t structs representing the given drones
+    @param num_drones The number of drones in the array
+    @param lantern A pointer to a lantern_t struct representing the current lantern
+    @param drone_free_time An array of integers representing the time at which each drone will be free to eliminate a new lantern
+    @param drone_cur_pos An array of integers representing the current position of each drone
+    @return The index of the best drone to eliminate the lantern, or -1 if no drone can eliminate the lantern
+**/ 
 int remove_prerequisites(subject_t* target, subject_t* prereq) {
     for (int i = 0; i < target->num_prereqs; i++) {
         char* code = target->pre_req[i];
@@ -118,13 +127,18 @@ int remove_prerequisites(subject_t* target, subject_t* prereq) {
 }
 
 void kahns_toposort(subject_t* major, int num_subjects){
-   //TO DO: Complete Kahn's algorithm
-    int sorted_count = 0;
-    char **code_prints = (char**)malloc(sizeof(char*) * num_subjects);
-    
-    while (sorted_count < num_subjects) {
-        int found_index = -1;
+    //TO DO: Complete Kahn's algorithm
 
+    int sorted_count = 0;
+
+    // Allocate an array to store the sorted order of subject codes (as pointers to strings)
+    char **code_prints = (char**)malloc(sizeof(char*) * num_subjects);   
+
+    while (sorted_count < num_subjects) {
+
+        int found_index = -1;
+        
+        // Iterate through the major to find a subject without prerequisities
         for (int i = 0; i < num_subjects; i++) {
             if (major[i].num_prereqs == 0) {
                 found_index = i;
@@ -132,18 +146,23 @@ void kahns_toposort(subject_t* major, int num_subjects){
             }
         }
 
+        // If no subject without prerequisites is found, it means there is a cycle or missing prereqs
         if (found_index == -1) {
             printf("Pre-requisites impossible - check for cycles or missing pre-requisites\n");
             free(code_prints);
             return;
         }
 
+        // Add the subject code to the sorted order and mark it as added by setting num_prereqs to -1
         subject_t* current = &major[found_index];
         code_prints[sorted_count] = current->code;
-        current->num_prereqs = PRINTED;
         sorted_count++;
-
+        current->num_prereqs = -1;
+        
+        // For every subject in the major, remove the current subject from their prereqs if they exist
         for (int i = 0; i < num_subjects; i++) {
+
+            // For speed skip subjects that have already been added to sorted order / have no prereqs
             if (major[i].num_prereqs > 0) {
                 remove_prerequisites(&major[i], current);
             }
